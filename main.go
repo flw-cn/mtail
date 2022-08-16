@@ -54,7 +54,10 @@ func main() {
 		name2id[fileName] = id
 
 		textView := tview.NewTextView().
-			SetWordWrap(true).
+			SetDynamicColors(true).
+			SetScrollable(true).
+			SetTextColor(tcell.ColorSilver).
+			SetMaxLines(200).
 			SetChangedFunc(func() {
 				app.Draw()
 			})
@@ -63,7 +66,8 @@ func main() {
 
 		go func() {
 			for line := range file.Lines {
-				fmt.Fprintln(textView, line.Text)
+				fmt.Fprintln(textView, tview.TranslateANSI(line.Text))
+				textView.ScrollToEnd()
 			}
 		}()
 
@@ -76,7 +80,8 @@ func main() {
 	}
 
 	title := tview.NewTextView().
-		SetText(os.Args[1])
+		SetDynamicColors(true).
+		SetText("[::bl]" + os.Args[1])
 
 	title.SetTextColor(tcell.ColorLightYellow).
 		SetTextAlign(tview.AlignCenter).
@@ -86,7 +91,7 @@ func main() {
 		name, _ := pages.GetFrontPage()
 		index, _ := strconv.Atoi(name)
 		next := (index + 1) % pages.GetPageCount()
-		title.SetText(id2name[next])
+		title.SetText("[::bl]" + id2name[next])
 		pages.SwitchToPage(fmt.Sprintf("%d", next))
 	}
 
